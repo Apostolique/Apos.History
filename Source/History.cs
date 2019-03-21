@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using Optional;
 
-namespace Apos.History
-{
+namespace Apos.History {
     /// <summary>
     /// Base class for History classes. Provides undo, redo.
     /// </summary>
