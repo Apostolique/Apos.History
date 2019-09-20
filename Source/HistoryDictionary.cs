@@ -69,8 +69,6 @@ namespace Apos.History {
             }
             set {
                 Replace(key, value);
-
-                TryCommit();
             }
         }
         public IEnumerator<KeyValuePair<T, K>> GetEnumerator() {
