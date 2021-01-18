@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Apos.History {
     /// <summary>
@@ -7,7 +6,7 @@ namespace Apos.History {
     /// Mostly used for undo and redo functionality.
     /// </summary>
     public class HistorySet {
-        public HistorySet(List<Action> undos, List<Action> redos) {
+        public HistorySet(Action[] undos, Action[] redos) {
             _undos = undos;
             _redos = redos;
         }
@@ -22,7 +21,7 @@ namespace Apos.History {
             }
         }
 
-        List<Action> _redos;
-        List<Action> _undos;
+        Action[] _redos;
+        Action[] _undos;
     }
 }
