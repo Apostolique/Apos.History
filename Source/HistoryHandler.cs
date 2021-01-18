@@ -5,17 +5,26 @@ namespace Apos.History {
     /// This class makes it easy to provide undo and redo over multiple data structures.
     /// </summary>
     public class HistoryHandler : History {
+        /// <summary>
+        /// The history is local when null. Otherwise it's managed by a HistoryHandler.
+        /// </summary>
         public HistoryHandler(HistoryHandler? historyHandler) : base(historyHandler) { }
 
+        /// <summary>
+        /// Adds a HistorySet to the pending list and tries to commit it.
+        /// </summary>
         public void Add(HistorySet hs) {
-            _pastSetup.Add(hs.Undo);
-            _futureSetup.Add(hs.Redo);
+            _pendingUndo.Add(hs.Undo);
+            _pendingRedo.Add(hs.Redo);
 
             TryCommit();
         }
+        /// <summary>
+        /// Adds undo and redo actions to the pending list and tries to commit them.
+        /// </summary>
         public void Add(Action undo, Action redo) {
-            _pastSetup.Add(undo);
-            _futureSetup.Add(redo);
+            _pendingUndo.Add(undo);
+            _pendingRedo.Add(redo);
 
             TryCommit();
         }
