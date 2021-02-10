@@ -51,10 +51,35 @@ public class HistoryInt : History {
         TryCommit();
     }
 
-    private int _value;
+    private int _value = 0;
 }
 ```
 
 This class manages an int called `_value` and exposes the `Value` property. If the history is managed locally, in other word no `HistoryHandler` was given to the constructor, then you can call `Undo()` and `Redo()` on it.
 
 In order to build the history, you can add some `Action` to the `_pendingUndo` and `_pendingRedo` lists. These will get applied to the history by `Commit()`. `Commit()` is called by `TryCommit()` if `AutoCommit` is set to `true`.
+
+To use it you can do:
+
+```csharp
+var historyInt = new HistoryInt();
+
+historyInt.Value = 1; // Value becomes 1
+historyInt.Value = 2; // Value becomes 2
+historyInt.Value = 3; // Value becomes 3
+
+historyInt.Undo(); // Value becomes 2
+
+// Disable auto commit for manual mode.
+historyInt.AutoCommit = false;
+historyInt.Value = 4;
+historyInt.Commit(); // Value becomes 4
+historyInt.Value = 5;
+historyInt.Commit(); // Value becomes 5
+historyInt.AutoCommit = true;
+
+historyInt.Undo(); // Value becomes 4
+historyInt.Undo(); // Value becomes 2
+
+historyInt.Redo(); // Value becomes 4
+```
