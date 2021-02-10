@@ -6,6 +6,10 @@ namespace Apos.History {
     /// </summary>
     public class HistoryHandler : History {
         /// <summary>
+        /// History that is managed locally.
+        /// </summary>
+        public HistoryHandler() { }
+        /// <summary>
         /// The history is local when null. Otherwise it's managed by a HistoryHandler.
         /// </summary>
         public HistoryHandler(HistoryHandler? historyHandler) : base(historyHandler) { }
