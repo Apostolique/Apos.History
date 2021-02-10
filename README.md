@@ -1,57 +1,65 @@
 # Apos.History
 A C# library that makes it easy to handle undo and redo.
 
-[![Discord](https://img.shields.io/discord/257949867551358987.svg)](https://discord.gg/Wwdb9Cs)
+[![Discord](https://img.shields.io/discord/257949867551358987.svg)](https://discord.rashtal.com/)
 
 ## Documentation
 
-* Coming soon!
+* [Getting started](https://apostolique.github.io/Apos.History/getting-started/)
 
 ## Build
 
-### [NuGet](https://www.nuget.org/packages/Apos.History/) [![NuGet](https://img.shields.io/nuget/v/Apos.History.svg)](https://www.nuget.org/packages/Apos.History/) [![NuGet](https://img.shields.io/nuget/dt/Apos.History.svg)](https://www.nuget.org/packages/Apos.History/)
+[![NuGet](https://img.shields.io/nuget/v/Apos.History.svg)](https://www.nuget.org/packages/Apos.History/) [![NuGet](https://img.shields.io/nuget/dt/Apos.History.svg)](https://www.nuget.org/packages/Apos.History/)
 
 ## Features
 
 * Undo
 * Redo
 * History from multiple data structures.
+* Remove earliest history if needed.
 
 ## Usage
 
 ```csharp
-var historyHandler = new HistoryHandler(Option.None<HistoryHandler>());
+var historyHandler = new HistoryHandler();
 
-var listA = new HistoryList<int>(new List<int>(), Option.Some(historyHandler));
-var listB = new HistoryList<int>(new List<int>(), Option.Some(historyHandler));
+int fishCount = 0;
+int appleCount = 0;
 
-listA.Add(1);
-listA.Add(2);
-listA.Add(3);
+SaveFishCount(fishCount, 3);
+SaveFishCount(fishCount, 4);
+SaveFishCount(fishCount, 5);
+
+SaveAppleCount(appleCount, 7);
+SaveAppleCount(appleCount, 9);
+SaveAppleCount(appleCount, 4);
+SaveAppleCount(appleCount, 5);
+
+// Group multiple histories in one batch.
+historyHandler.AutoCommit = false;
+SaveFishCount(fishCount, 10);
+SaveAppleCount(appleCount, 20);
+// Call Commit manually.
+historyHandler.Commit();
+historyHandler.AutoCommit = true;
 
 historyHandler.Undo();
 historyHandler.Undo();
 
 historyHandler.Redo();
 
-listA.Add(4);
-
-listB.Add(11);
-listB.Add(12);
-
-historyHandler.Undo();
-historyHandler.Undo();
-historyHandler.Undo();
-historyHandler.Undo();
-historyHandler.Undo();
-
-historyHandler.AutoCommit = false;
-listB.Add(1);
-listB.Add(2);
-listB.Add(3);
-historyHandler.Commit();
-historyHandler.AutoCommit = true;
-
-//This next undo will work on the 3 last adds at the same time.
-historyHandler.Undo();
+SaveFishCount(int oldCount, int newCount) {
+    historyHandler.Add(() => {
+        fishCount = oldCount;
+    }, () => {
+        fishCount = newCount;
+    });
+}
+SaveAppleCount(int oldCount, int newCount) {
+    historyHandler.Add(() => {
+        appleCount = oldCount;
+    }, () => {
+        appleCount = newCount;
+    });
+}
 ```
