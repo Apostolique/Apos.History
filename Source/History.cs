@@ -22,13 +22,17 @@ namespace Apos.History {
         } = true;
 
         /// <summary>
-        /// True when it's possible to undo.
+        /// Gets the number of elements in the undo stack.
         /// </summary>
-        public bool CanUndo => _undo.Count > 0;
+        public int UndoCount => _undo.Count;
         /// <summary>
-        /// True when it's possible to redo.
+        /// Gets the number of elements in the redo stack.
         /// </summary>
-        public bool CanRedo => _redo.Count > 0;
+        public int RedoCount => _redo.Count;
+        /// <summary>
+        /// Gets the number of elements in total. (UndoCount + RedoCount)
+        /// </summary>
+        public int Count => UndoCount + RedoCount;
 
         /// <summary>
         /// Commits when AutoCommit is set to true.
@@ -51,7 +55,7 @@ namespace Apos.History {
                     _historyHandler.Add(hs);
                 } else {
                     hs.Redo();
-                    _undo.Push(hs);
+                    _undo.AddLast(hs);
                 }
 
                 _pendingRedo.Clear();
@@ -63,9 +67,10 @@ namespace Apos.History {
         /// </summary>
         public void Undo() {
             if (_undo.Count > 0) {
-                HistorySet hs = _undo.Pop();
+                HistorySet hs = _undo.Last.Value;
+                _undo.RemoveLast();
                 hs.Undo();
-                _redo.Push(hs);
+                _redo.AddLast(hs);
             }
         }
         /// <summary>
@@ -73,20 +78,42 @@ namespace Apos.History {
         /// </summary>
         public void Redo() {
             if (_redo.Count > 0) {
-                HistorySet hs = _redo.Pop();
+                HistorySet hs = _redo.Last.Value;
+                _redo.RemoveLast();
                 hs.Redo();
-                _undo.Push(hs);
+                _undo.AddLast(hs);
+            }
+        }
+
+        /// <summary>
+        /// Removes a range of elements from the undo stack keeping only the newest elements.
+        /// </summary>
+        /// <param name="count">The number of elements to keep.</param>
+        public void Keep(int count) {
+            int amount = Math.Max(count, 0);
+            while (_undo.Count > amount) {
+                _undo.RemoveFirst();
+            }
+        }
+        /// <summary>
+        /// Removes a range of elements from the undo stack keeping only the newest elements.
+        /// </summary>
+        /// <param name="count">The number of elements to remove.</param>
+        public void Remove(int count) {
+            int amount = Math.Min(count, _undo.Count);
+            for (int i = 0; i < amount; i++) {
+                _undo.RemoveFirst();
             }
         }
 
         /// <summary>
         /// Undo stack.
         /// </summary>
-        protected Stack<HistorySet> _undo = new Stack<HistorySet>();
+        protected LinkedList<HistorySet> _undo = new LinkedList<HistorySet>();
         /// <summary>
         /// Redo stack.
         /// </summary>
-        protected Stack<HistorySet> _redo = new Stack<HistorySet>();
+        protected LinkedList<HistorySet> _redo = new LinkedList<HistorySet>();
         /// <summary>
         /// Undo states that haven't been commited yet.
         /// </summary>
