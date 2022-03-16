@@ -20,10 +20,7 @@ namespace Apos.History {
         /// <summary>
         /// When false, the history is delayed until Commit() is called manually.
         /// </summary>
-        public bool AutoCommit {
-            get;
-            set;
-        } = true;
+        public bool AutoCommit { get; set; } = true;
 
         /// <summary>
         /// Gets the number of elements in the undo stack.
