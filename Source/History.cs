@@ -47,7 +47,8 @@ namespace Apos.History {
             }
         }
         /// <summary>
-        /// Commits pending undo and redo to the undo and redo stacks.
+        /// Commits pending undo and redo to the undo and redo stacks and executes redo.
+        /// This only needs to be called when AutoCommit is set to false.
         /// </summary>
         public void Commit() {
             if (_pendingUndo.Count > 0 && _pendingRedo.Count > 0) {
@@ -59,6 +60,26 @@ namespace Apos.History {
                     _historyHandler.Add(hs);
                 } else {
                     hs.Redo();
+                    _undo.AddLast(hs);
+                }
+
+                _pendingRedo.Clear();
+                _pendingUndo.Clear();
+            }
+        }
+        /// <summary>
+        /// Commits pending undo and redo to the undo and redo stacks without executing redo.
+        /// This only needs to be called when AutoCommit is set to false.
+        /// </summary>
+        public void CommitOnly() {
+            if (_pendingUndo.Count > 0 && _pendingRedo.Count > 0) {
+                _pendingUndo.Reverse();
+                HistorySet hs = new HistorySet(_pendingUndo.ToArray(), _pendingRedo.ToArray());
+                _redo.Clear();
+
+                if (_historyHandler != null) {
+                    _historyHandler.Add(hs);
+                } else {
                     _undo.AddLast(hs);
                 }
 
